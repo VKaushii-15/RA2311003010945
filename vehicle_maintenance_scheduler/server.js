@@ -1,11 +1,10 @@
-require('dotenv').config(); // Load environment variables from .env file
-const axios = require('axios'); // Added axios for external API calls
+require('dotenv').config(); 
+const axios = require('axios'); 
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-// Middleware to refresh the authorization token
 async function refreshAuthToken() {
     try {
         console.log("Refreshing authorization token...");
@@ -21,15 +20,14 @@ async function refreshAuthToken() {
     }
 }
 
-// Wrapper function to handle API requests with token refresh
 async function makeApiRequest(url, options) {
     try {
         return await axios.get(url, options);
     } catch (error) {
-        if (error.response?.status === 401) { // Unauthorized, token might be invalid
+        if (error.response?.status === 401) {
             await refreshAuthToken();
             options.headers['Authorization'] = `Bearer ${process.env.ACCESS_TOKEN}`;
-            return await axios.get(url, options); // Retry with new token
+            return await axios.get(url, options);
         } else {
             throw error;
         }
